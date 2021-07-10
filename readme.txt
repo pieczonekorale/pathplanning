@@ -1,0 +1,1 @@
+planowanie wersja 1
