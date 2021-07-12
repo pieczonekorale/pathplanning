@@ -55,7 +55,7 @@ class Vehicle:
     alfa_cos=(math.cos(math.radians(alfa)))
     #angle check
     if alfa == 90:
-      alfa_cos =0
+      alfa_cos = 0
     if alfa == 0:
       alfa_sin = 0
 
