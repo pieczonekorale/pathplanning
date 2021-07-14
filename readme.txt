@@ -22,4 +22,12 @@ każdym wyświetlaniem zajmie się osobna metoda.
 "plot_corners"
 Metoda wyświetla tylko bieżące położenie pojazdu
 
+"move"
+metoda przyjmuje współrzędne ścieżki referencyjnej
+Porusza pojazdem o jedną próbkę czasu do przodu
+Jest to bardzo uproszczona implementacja algorytmu zaproponowanego w ostatnim pliku pdf.
+Stopniowo dołączane będą rozwinięcia algorytmu.
+
+
 Dalsze instrukcje lokalnie testują działanie powyższych metod.
+

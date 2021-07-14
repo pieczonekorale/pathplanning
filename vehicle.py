@@ -1,4 +1,5 @@
 import numpy as np
+import sympy
 import matplotlib.pyplot as plt
 import math
 
@@ -7,7 +8,7 @@ class Vehicle:
   center_y = 0 #y srodka grawitacji
   size_w = 0 #szerokosc
   size_h = 0 #dlugosc
-  Psi = 0  # kat odchylenia od osi
+  psi = 0  # kat odchylenia od osi
   v = 1  # pkt na jednostke czasu
   R = 1  # PROMIEN KRZYWIZNY ???
   w = 0  # predkosc katowa init
@@ -16,7 +17,7 @@ class Vehicle:
   corners = [] #wierzcholki pojazdu
   u = [] #wektor polozenia
   q = [] #wektor kontroli
-
+  movement = []
 
   def __init__(self, size_x, size_y):
     self.size_w= size_x/2 #promien szerokosci samochodu
@@ -32,12 +33,14 @@ class Vehicle:
     #self.q = [self.v, self.w] #wektor kontroli predkosci
 
   def get_corners(self):
-    current = self.corners
-    return current
+    return self.corners
 
   def get_center(self):
     center = [self.center_x, self.center_y]
     return center
+
+  def get_velocity(self):
+    return self.v
 
   def corners_update(self, new_center_x, new_center_y):
     self.center_x=new_center_x
@@ -48,9 +51,11 @@ class Vehicle:
                     [self.center_x - self.size_w, self.center_y + self.size_h]]  # wspolrzedne wierzcholkow samochodu
 
 
-
+  def angle_update(self, angle):
+    self.psi = angle
 
   def rotate (self, alfa):
+    self.angle_update(alfa)
     alfa_sin=(math.sin(math.radians(alfa)))
     alfa_cos=(math.cos(math.radians(alfa)))
     #angle check
@@ -92,6 +97,79 @@ class Vehicle:
     plt.grid(True)
     plt.show()
 
+
+  def check_angle(self):
+    corners = self.get_corners()
+    center = self.get_center()
+    reference = corners[1]
+    len = self.w/2
+    #do dokonczenia jesli bedzie potrzebna
+
+
+
+  def move(self, refpath):
+    #sprawdz gdzie jestes
+    current_center = self.get_center()
+    current_corners = self.get_corners()
+    current_angle = self.psi
+    ycerr = 2137
+    ycerr_cross=[]
+    #liczenie bledu YCERR - odleglosc xcyc od sciezki referencyjnej
+    #BARDZO UPROSZCZONE tylko dla linii prostych pod kątem 0 lub 90
+
+
+    if current_center[1] > refpath[0][1]:
+      if current_center [1] < refpath[1][1]:
+        ycerr_cross = [refpath[0][0], current_center[1]]
+    else:
+      ycerr_cross = [current_center[0], refpath[0][1]]
+
+    ycerr = math.dist(current_center, ycerr_cross)
+    #print(ycerr)
+
+    #policzenie skladowych wektora predkosci
+    psi_sin=(math.sin(math.radians(current_angle)))
+    psi_cos=(math.cos(math.radians(current_angle)))
+    if current_angle == 90:
+      psi_cos = 0
+    if current_angle == 0:
+      psi_sin = 0
+    current_velocity = self.get_velocity()
+    vx = current_velocity * psi_cos
+    vy = current_velocity * psi_sin
+
+    #polozenie krok do przodu
+    sim_x = current_center[0] + vx
+    sim_y = current_center[1] + vy
+    #print(sim_x, sim_y)
+
+
+    #POLICZENIE BLEDU YERR
+    if sim_y > refpath[0][1]:
+      if sim_y < refpath[1][1]:
+        yerr_cross = [refpath[0][0], sim_y]
+    else:
+      yerr_cross = [sim_x, refpath[0][1]]
+
+    yerr = math.dist([sim_x, sim_y], yerr_cross)
+    #print(yerr)
+
+    #POLICZENIE BŁĘDU ODCHYLENIA
+    err_helper = math.dist([sim_x, sim_y], current_center)
+    err_angle = 0 #zalozenie dla konkretnego przypadku w celu testu
+    #tutaj nalezy policzyc tanens miedzy styczna do sciezki, a odcinkiem err_helper, aby wyznaczyc blad odchylenia
+
+    #POLICZENIE PID - teoria
+    #w_controller = self.kp * yerr + self.kd * (d yerr / dt) + self.ki integral (yerr dt)
+
+    #jedziemy do przodu
+    #zebrane dane i ich wpływ - do przepracowania
+    if ycerr == 0 and err_angle == 0:
+      self.corners_update(sim_x, sim_y)
+
+
+
+
   def plot_corners(self):
     curr = self.get_corners()
     x_results = []
@@ -111,9 +189,32 @@ class Vehicle:
 
 
 
-
+'''
 v2=Vehicle(4,2)
 v2.plot_corners()
 v2.corners_update(4,4)
 v2.plot_corners()
 v2.rotate(30)
+'''
+path1 = [[0,0], [6,0]]
+path2 = [[6,0], [6,6]]
+v1 = Vehicle(2,2)
+v1.plot_corners()
+
+#path plotter
+plot_xc = []
+plot_yc = []
+
+for i in range(6):
+  v1.move(path1)
+  center = v1.get_center()
+  print(center)
+  plot_xc.append(center[0])
+  plot_yc.append(center[1])
+
+
+plt.gca().set_aspect("equal")
+plt.axis([-8, 8, -8, 8])
+plt.plot(plot_xc, plot_yc, 'o', color='black');
+plt.grid(True)
+plt.show()
