@@ -1,0 +1,11 @@
+TO DO LIST
+18.07
+
+- poruszanie sie po całej ścieżce
+- ujednolicenie implementacyjnej postaci ścieżek, przechowywania prostych itd.
+- zdefiniowanie korekcji ruchu podczas jednego kroku
+- testowanie ruszania spoza trasy idealnej
+- rozpracowanie prędkości i przyspieszenia kątowego i ich wpływu na ruch
+- poruszanie się po okręu
+- zaprogramowanie ścieżek z okręgami na zakrętach
+

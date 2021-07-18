@@ -42,14 +42,17 @@ class Vehicle:
   def get_velocity(self):
     return self.v
 
-  def corners_update(self, new_center_x, new_center_y):
+  def center_update(self, new_center_x, new_center_y): #jesli jest modyfikowany kat odchylenia, ta funkcja aktualizuje centrum, a funkcja rotate zajmuje sie wierzcholkami
+    self.center_x = new_center_x
+    self.center_y = new_center_y
+
+  def corners_update(self, new_center_x, new_center_y): #uzywany jesli chcemy przesunac samochod bez modyfikacji kata
     self.center_x=new_center_x
     self.center_y=new_center_y
     self.corners = [[self.center_x - self.size_w, self.center_y - self.size_h],
                     [self.center_x + self.size_w, self.center_y - self.size_h],
                     [self.center_x + self.size_w, self.center_y + self.size_h],
                     [self.center_x - self.size_w, self.center_y + self.size_h]]  # wspolrzedne wierzcholkow samochodu
-
 
   def angle_update(self, angle):
     self.psi = angle
@@ -83,20 +86,6 @@ class Vehicle:
       rot_y = rot_y+dist_y
       updated_corners.append([rot_x,rot_y])
     print(updated_corners)
-    x_results = []
-    y_results = []
-    for j in updated_corners:
-      x_results.append(j[0])
-      y_results.append(j[1])
-    x_results.append(x_results[0])
-    y_results.append(y_results[0])
-    plt.axis([-8, 8, -8, 8])
-
-    plt.gca().set_aspect("equal")
-    plt.plot(x_results, y_results)
-    plt.grid(True)
-    plt.show()
-
 
   def check_angle(self):
     corners = self.get_corners()
@@ -104,8 +93,6 @@ class Vehicle:
     reference = corners[1]
     len = self.w/2
     #do dokonczenia jesli bedzie potrzebna
-
-
 
   def move(self, refpath):
     #sprawdz gdzie jestes
@@ -166,8 +153,9 @@ class Vehicle:
     #zebrane dane i ich wpływ - do przepracowania
     if ycerr == 0 and err_angle == 0:
       self.corners_update(sim_x, sim_y)
-
-
+    else:
+      self.center_update(sim_x, sim_y)
+      self.rotate(err_angle)
 
 
   def plot_corners(self):
@@ -188,14 +176,6 @@ class Vehicle:
 
 
 
-
-'''
-v2=Vehicle(4,2)
-v2.plot_corners()
-v2.corners_update(4,4)
-v2.plot_corners()
-v2.rotate(30)
-'''
 path1 = [[0,0], [6,0]]
 path2 = [[6,0], [6,6]]
 v1 = Vehicle(2,2)
