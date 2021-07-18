@@ -101,7 +101,7 @@ class Vehicle:
     current_angle = self.psi
     ycerr = 2137
     ycerr_cross=[]
-    #liczenie bledu YCERR - odleglosc xcyc od sciezki referencyjnej
+    #liczenie bledu YCERR - odleglosc centrum od sciezki referencyjnej
     #BARDZO UPROSZCZONE tylko dla linii prostych pod kątem 0 lub 90
 
 
@@ -144,7 +144,9 @@ class Vehicle:
     #POLICZENIE BŁĘDU ODCHYLENIA
     err_helper = math.dist([sim_x, sim_y], current_center)
     err_angle = 0 #zalozenie dla konkretnego przypadku w celu testu
-    #tutaj nalezy policzyc tanens miedzy styczna do sciezki, a odcinkiem err_helper, aby wyznaczyc blad odchylenia
+    #tutaj nalezy policzyc tangens miedzy styczna do sciezki, a odcinkiem err_helper, aby wyznaczyc blad odchylenia
+    
+
 
     #POLICZENIE PID - teoria
     #w_controller = self.kp * yerr + self.kd * (d yerr / dt) + self.ki integral (yerr dt)
