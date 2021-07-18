@@ -24,10 +24,21 @@ Metoda wyświetla tylko bieżące położenie pojazdu
 
 "move"
 metoda przyjmuje współrzędne ścieżki referencyjnej
-Porusza pojazdem o jedną próbkę czasu do przodu
-Jest to bardzo uproszczona implementacja algorytmu zaproponowanego w ostatnim pliku pdf.
-Stopniowo dołączane będą rozwinięcia algorytmu.
+Porusza pojazdem o jedną próbkę czasu do przodu.
+Jest stale rozwijana, obecnie dopracowywane jest poruszanie się po dowolnych odcinkach oraz poruszanie się w czasie.
 
 
 Dalsze instrukcje lokalnie testują działanie powyższych metod.
 
+
+PLIK "PATH_HELPER"
+zawiera kilka pomocniczych funkcji, przyspieszających:
+- obliczanie współczynników wzoru funkcji liniowej
+- obliczanie punktu przecięcia 2 prostych
+- sprawdzenie, pod jakim kątem odcinek odchylony jest od osi x
+
+PLIK 'LINE'
+pomocnicza klasa do obsługi funkcji liniowych. przechowuje współczynniki wzoru funkcji i może wyliczać odległość bieżącej prostej do dowolnego punktu
+
+PLIK 'TO-DO'
+podręczna lista kolejnych kroków do implementacji

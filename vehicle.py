@@ -2,6 +2,8 @@ import numpy as np
 import sympy
 import matplotlib.pyplot as plt
 import math
+from Line import Line
+from path_helper import *
 
 class Vehicle:
   center_x = 0 #x srodka grawitacji
@@ -85,7 +87,7 @@ class Vehicle:
       rot_x = rot_x+dist_x #powrot do poczatku ukladu wspolrzednych
       rot_y = rot_y+dist_y
       updated_corners.append([rot_x,rot_y])
-    print(updated_corners)
+    #print(updated_corners)
 
   def check_angle(self):
     corners = self.get_corners()
@@ -99,20 +101,13 @@ class Vehicle:
     current_center = self.get_center()
     current_corners = self.get_corners()
     current_angle = self.psi
-    ycerr = 2137
-    ycerr_cross=[]
     #liczenie bledu YCERR - odleglosc centrum od sciezki referencyjnej
-    #BARDZO UPROSZCZONE tylko dla linii prostych pod kątem 0 lub 90
-
-
-    if current_center[1] > refpath[0][1]:
-      if current_center [1] < refpath[1][1]:
-        ycerr_cross = [refpath[0][0], current_center[1]]
+    if refpath[0][0] == refpath [1][0]: #przypadek ze odcinek nie jest funkcja
+      ycerr = abs(current_center[0]-refpath[0][0])
     else:
-      ycerr_cross = [current_center[0], refpath[0][1]]
-
-    ycerr = math.dist(current_center, ycerr_cross)
-    #print(ycerr)
+      refline = formula(refpath[0][0], refpath[0][1], refpath[1][0], refpath[1][1])
+      ycerr = refline.distance(current_center[0], current_center[1])
+      print(ycerr)
 
     #policzenie skladowych wektora predkosci
     psi_sin=(math.sin(math.radians(current_angle)))
@@ -128,24 +123,19 @@ class Vehicle:
     #polozenie krok do przodu
     sim_x = current_center[0] + vx
     sim_y = current_center[1] + vy
-    #print(sim_x, sim_y)
 
-
+    yerr_cross = []
     #POLICZENIE BLEDU YERR
-    if sim_y > refpath[0][1]:
-      if sim_y < refpath[1][1]:
-        yerr_cross = [refpath[0][0], sim_y]
+    if refpath[0][0] == refpath [1][0]: #przypadek ze odcinek nie jest funkcja
+      yerr = abs(sim_x-refpath[0][0])
     else:
-      yerr_cross = [sim_x, refpath[0][1]]
-
-    yerr = math.dist([sim_x, sim_y], yerr_cross)
-    #print(yerr)
+      sim_refline = formula(refpath[0][0], refpath[0][1], refpath[1][0], refpath[1][1])
+      yerr = sim_refline.distance(sim_x, sim_y)
+      #print(yerr)
 
     #POLICZENIE BŁĘDU ODCHYLENIA
     err_helper = math.dist([sim_x, sim_y], current_center)
-    err_angle = 0 #zalozenie dla konkretnego przypadku w celu testu
-    #tutaj nalezy policzyc tangens miedzy styczna do sciezki, a odcinkiem err_helper, aby wyznaczyc blad odchylenia
-    
+    err_angle = angle_check(refpath[0], refpath[1]) - self.psi
 
 
     #POLICZENIE PID - teoria
@@ -153,11 +143,23 @@ class Vehicle:
 
     #jedziemy do przodu
     #zebrane dane i ich wpływ - do przepracowania
-    if ycerr == 0 and err_angle == 0:
+    if err_angle == 0:
       self.corners_update(sim_x, sim_y)
     else:
-      self.center_update(sim_x, sim_y)
+      #self.center_update(sim_x, sim_y)
       self.rotate(err_angle)
+      new_angle = self.psi
+      new_sin = (math.sin(math.radians(new_angle)))
+      new_cos = (math.cos(math.radians(new_angle)))
+      if new_angle == 90:
+        new_cos = 0
+      if new_angle == 0:
+        new_sin = 0
+      new_vel = self.get_velocity()
+      new_vx = new_vel * new_cos
+      new_vy = new_vel * new_sin
+
+      self.corners_update(current_center[0] + new_vx, current_center[1] + new_vy)
 
 
   def plot_corners(self):
@@ -178,8 +180,8 @@ class Vehicle:
 
 
 
-path1 = [[0,0], [6,0]]
-path2 = [[6,0], [6,6]]
+path1 = [[0,0], [3,0]]
+path2 = [[3,0], [3,8]]
 v1 = Vehicle(2,2)
 v1.plot_corners()
 
@@ -187,10 +189,19 @@ v1.plot_corners()
 plot_xc = []
 plot_yc = []
 
-for i in range(6):
+for i in range(3):
   v1.move(path1)
   center = v1.get_center()
   print(center)
+  plot_xc.append(center[0])
+  plot_yc.append(center[1])
+
+print(v1.get_center())
+
+for i in range(8):
+  v1.move(path2)
+  center = v1.get_center()
+  #print(center)
   plot_xc.append(center[0])
   plot_yc.append(center[1])
 

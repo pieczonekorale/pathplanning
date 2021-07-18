@@ -16,11 +16,9 @@ class Line:
         coeff = [self.a, self.b]
         return coeff
 
-    def angle_check(self):
-        pass
-
     #ODLEGLOSC PUNKTU OD DANEJ LINII - DO OBLICZANIA CERR
     def distance(self, x, y):
-        dist = (-1*self.a*x + y -self.b) / math.sqrt((self.a*self.a)+1)
-        return dist
+        coeff = self.coeff_get()
+        dist = (-1*coeff[0]*x + y -coeff[1]) / math.sqrt((coeff[0]*coeff[0])+1)
+        return abs(dist)
 
